@@ -25,13 +25,13 @@ public class Starting {
 	public static void main(String[] args) throws InterruptedException {
 		 ScheduledExecutorService scheduledPool = Executors.newScheduledThreadPool(15);
 		 //the times to monitor
-		 int count =10;
+		 int count =31;
 //		 int count =30;
 //		 int metiscount = 1;
-		 
+		 HashMap<String, HashMap<String, Long>> flowrecords = new HashMap<>();
 		 for (int i = 0; i< count; i++){
 		 //
-			ReUpdate ru = new ReUpdate("http://43.240.96.30:8080");
+			ReUpdate ru = new ReUpdate("http://43.240.96.30:8080",flowrecords);
 			scheduledPool.schedule(ru, 0, TimeUnit.SECONDS);
 			System.out.println("new thread start");
 //			Thread.sleep(10*1000);
@@ -40,7 +40,7 @@ public class Starting {
 ////			s.mergeInfo();
 //			s.writeOpdemand();
 			
-			Thread.sleep(60*1000);
+			Thread.sleep(2*60*1000);
 //			if(i<metiscount){
 //				System.out.println("start the metis generation");
 //				GenerateMetis gm = new GenerateMetis();

@@ -25,15 +25,17 @@ public class ReUpdate implements Runnable{
 	JSONObject jobj;
 	String output;
 	BufferedReader br;
-
+	//the historical records of flow from previous round
+	HashMap<String,HashMap<String, Long>> flowrecords;
+	
 	ArrayList<String> topologyid;
-	public ReUpdate(String hostport) {
+	public ReUpdate(String hostport, HashMap<String,HashMap<String, Long>> flowrecords) {
 		// TODO Auto-generated constructor stub
 		this.hostport = hostport;
 		this.obj = null;
 		this.jobj = null;
 		this.output = "";
-
+		this.flowrecords = flowrecords;
 		topologyid = new ArrayList<>();
 	}
 
@@ -105,6 +107,11 @@ public class ReUpdate implements Runnable{
 		else{
 			for(String s : topo){
 				System.out.println("start collect infor for "+s);
+				//if this is the first time to see the topology s, initialize the flowrecords
+				if(!flowrecords.containsKey(s)){
+					HashMap<String, Long> r = new HashMap<>();
+					flowrecords.put(s, r);
+				}
 				//get the operator list
 				ArrayList<String> temp = Operatorinfo(s);
 				//delay of each operator
@@ -112,21 +119,20 @@ public class ReUpdate implements Runnable{
 				HashMap<String, Double> prodelay = new HashMap<>();
 				//the data communication between two operators
 				HashMap<String, Long> flow = new HashMap<>();
-				//keep the previous records and make the flow as the data communication happened over the last interval
-				HashMap<String, Long> flowrecords = new HashMap<>();
 				//executor states of the given operator
 				HashMap<String, ArrayList<String>> exe = new HashMap<>();
 //				System.out.println("check topologyinfo, operator size "+temp.size());
 				for(String oid: temp){
 					if(!oid.contains("integer")){
 //						System.out.println("update info for "+oid);
-						operatorDetail(s, oid, temp, exedelay, prodelay, flow, exe);
+						operatorDetail(s, oid, temp, exedelay, prodelay, flow,exe);
 					}
 					else{
 //						System.out.println("update infor for "+oid);
 						spoutDetail(s, oid, temp, exedelay, flow, exe);
 					}
 				}
+				System.out.println("finish udpate");
 				//				System.out.println("print delay info");
 				String delaystring = "";
 				for(String node: exedelay.keySet()){
@@ -138,11 +144,29 @@ public class ReUpdate implements Runnable{
 //				System.out.println("inside topologyinfo check the delay string "+delaystring);
 				Method.writeFile(delaystring, "performance/delay", true);
 				String flowstring = "";
+				HashMap<String, Long> records = flowrecords.get(s);
 				//				System.out.println("print flow info");
-				for(String node : flow.keySet()){
-					flowstring += node+" "+flow.get(node);
-					flowstring += "\n";
-					//					System.out.println();
+				// initiallize it at the beginning
+				if(records.size()==0){
+					
+					for(String node : flow.keySet()){
+						System.out.println("first time updatet for "+node+ " with "+flow.get(node));
+						flowstring += node+" "+flow.get(node);
+						flowstring += "\n";
+					
+						records.put(node, flow.get(node));
+						
+					}
+				}
+				//the flowrecords is not empty
+				else{
+					for(String node : flow.keySet()){
+						flowstring += node+" "+(flow.get(node)-records.get(node));
+						flowstring += "\n";
+					
+						records.put(node, flow.get(node));
+						
+					}
 				}
 				Method.writeFile(flowstring, "performance/flow", true);
 				//				System.out.println("print exe info");
