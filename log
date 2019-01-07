@@ -1,0 +1,3 @@
+Jan 30. Finish the demo of kafka producer from JVM. send info to the kafka broker. 
+
+Next step: read data from file and send to the server; storm topology with spout of kafka consumer
