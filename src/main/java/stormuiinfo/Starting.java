@@ -25,7 +25,8 @@ public class Starting {
 	public static void main(String[] args) throws InterruptedException {
 		 ScheduledExecutorService scheduledPool = Executors.newScheduledThreadPool(15);
 		 //the times to monitor
-		 int count =5;
+
+		 int count =31;
 //		 int count =30;
 //		 int metiscount = 1;
 		 HashMap<String, HashMap<String, Long>> flowrecords = new HashMap<>();
@@ -39,8 +40,11 @@ public class Starting {
 //			Starting s = new Starting();
 ////			s.mergeInfo();
 //			s.writeOpdemand();
+
 			Thread.sleep(30*1000);
 //			Thread.sleep(2*60*1000);
+
+			
 //			if(i<metiscount){
 //				System.out.println("start the metis generation");
 //				GenerateMetis gm = new GenerateMetis();

@@ -105,10 +105,13 @@ public class ReUpdate implements Runnable{
 		if (topo.size() == 0)
 			System.out.println("no topology is working at the moment");
 		else{
+<<<<<<< HEAD
 			String delaystring = "";
 			String flowstring = "";
 			String exestring = "";
 			
+=======
+>>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
 			for(String s : topo){
 				System.out.println("start collect infor for "+s);
 				//if this is the first time to see the topology s, initialize the flowrecords
@@ -138,17 +141,27 @@ public class ReUpdate implements Runnable{
 				}
 				System.out.println("finish udpate");
 				//				System.out.println("print delay info");
+<<<<<<< HEAD
 				delaystring += s+"\n";
+=======
+				String delaystring = "";
+>>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
 				for(String node: exedelay.keySet()){
 					delaystring += node+ ","+exedelay.get(node)+","+prodelay.get(node);
 					delaystring += "\n";
 					//					System.out.println(node+" , "+ delay.get(node));
 					//					System.out.println();
 				}
+<<<<<<< HEAD
 				
 //				System.out.println("inside topologyinfo check the delay string "+delaystring);
 				
 				flowstring += s+"\n";
+=======
+//				System.out.println("inside topologyinfo check the delay string "+delaystring);
+				Method.writeFile(delaystring, "performance/delay", true);
+				String flowstring = "";
+>>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
 				HashMap<String, Long> records = flowrecords.get(s);
 				//				System.out.println("print flow info");
 				// initiallize it at the beginning
@@ -173,8 +186,14 @@ public class ReUpdate implements Runnable{
 						
 					}
 				}
+<<<<<<< HEAD
 				//				System.out.println("print exe info");
 				exestring += s+"\n";
+=======
+				Method.writeFile(flowstring, "performance/flow", true);
+				//				System.out.println("print exe info");
+				String exestring = "";
+>>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
 				for(String node : exe.keySet()){
 					exestring += node +","
 							+ "";
@@ -185,6 +204,7 @@ public class ReUpdate implements Runnable{
 					exestring += "\n";
 					//				System.out.println();
 				}
+<<<<<<< HEAD
 				
 			}
 			// write the records to the file
@@ -195,6 +215,13 @@ public class ReUpdate implements Runnable{
 		
 		}
 			
+=======
+				Method.writeFile(exestring, "performance/execution", false);
+			}
+			//		
+
+		}
+>>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
 	}
 
 

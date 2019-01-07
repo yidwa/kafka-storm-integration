@@ -32,7 +32,12 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="/Users/yidwa/Documents/PhD/jar/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="/Users/yidwa/Documents/PhD/jar/storm-starter-topologies-1.0.1.jar"/>
+=======
+	<classpathentry kind="lib" path="/Users/yidwa/Documents/apache-storm-1.0.1/examples/storm-starter/storm-starter-topologies-1.0.1.jar"/>
+	<classpathentry kind="lib" path="/Users/yidwa/Desktop/json-simple-1.1.1.jar"/>
+>>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

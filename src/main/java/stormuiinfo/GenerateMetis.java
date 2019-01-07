@@ -17,11 +17,15 @@ import org.apache.storm.utils.Time;
 import general.Method;
 import scala.collection.script.Start;
 
+<<<<<<< HEAD
 /**
  * metis graph partitioning
  * @author yidwa
  *
  */
+=======
+
+>>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
 
 public class GenerateMetis implements Runnable{
 
