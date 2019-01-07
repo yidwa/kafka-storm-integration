@@ -1,9 +1,5 @@
 Manifest-Version: 1.0
 Built-By: yidwa
-<<<<<<< HEAD
 Build-Jdk: 1.8.0_191
-=======
-Build-Jdk: 1.8.0_91
->>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
 Created-By: Maven Integration for Eclipse
 

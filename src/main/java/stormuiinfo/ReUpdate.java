@@ -7,7 +7,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -27,7 +34,8 @@ public class ReUpdate implements Runnable{
 	BufferedReader br;
 	//the historical records of flow from previous round
 	HashMap<String,HashMap<String, Long>> flowrecords;
-	
+	// keeps the latency(maximum of process or execute) for each operator, this will be used to write as operator demand
+	HashMap<String, String> maxmLa;;
 	ArrayList<String> topologyid;
 	public ReUpdate(String hostport, HashMap<String,HashMap<String, Long>> flowrecords) {
 		// TODO Auto-generated constructor stub
@@ -37,6 +45,7 @@ public class ReUpdate implements Runnable{
 		this.output = "";
 		this.flowrecords = flowrecords;
 		topologyid = new ArrayList<>();
+		maxmLa = new HashMap<String, String>();
 	}
 
 
@@ -47,8 +56,14 @@ public class ReUpdate implements Runnable{
 		//update the topology
 		Topologyget();
 		Topologyinfo(topologyid);
+		Testing(topologyid);
 	}
 
+
+	public void Testing(ArrayList<String> topologyid) {
+		HashMap<String, String[]> result = Partition.getOpt(topologyid);
+		Partition.writeOpdemand(maxmLa, result);
+	}
 	public void Connect(String q){
 		try {
 
@@ -105,20 +120,19 @@ public class ReUpdate implements Runnable{
 		if (topo.size() == 0)
 			System.out.println("no topology is working at the moment");
 		else{
-<<<<<<< HEAD
+
 			String delaystring = "";
 			String flowstring = "";
 			String exestring = "";
-			
-=======
->>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
+			String optString = "";
 			for(String s : topo){
-				System.out.println("start collect infor for "+s);
+//				System.out.println("start collect infor for "+s);
 				//if this is the first time to see the topology s, initialize the flowrecords
 				if(!flowrecords.containsKey(s)){
 					HashMap<String, Long> r = new HashMap<>();
 					flowrecords.put(s, r);
 				}
+				String spoutId = "integer";
 				//get the operator list
 				ArrayList<String> temp = Operatorinfo(s);
 				//delay of each operator
@@ -130,45 +144,41 @@ public class ReUpdate implements Runnable{
 				HashMap<String, ArrayList<String>> exe = new HashMap<>();
 //				System.out.println("check topologyinfo, operator size "+temp.size());
 				for(String oid: temp){
-					if(!oid.contains("integer")){
+					if(!oid.contains(spoutId)){
 //						System.out.println("update info for "+oid);
 						operatorDetail(s, oid, temp, exedelay, prodelay, flow,exe);
 					}
 					else{
 //						System.out.println("update infor for "+oid);
 						spoutDetail(s, oid, temp, exedelay, flow, exe);
+						
 					}
 				}
 				System.out.println("finish udpate");
 				//				System.out.println("print delay info");
-<<<<<<< HEAD
+
 				delaystring += s+"\n";
-=======
-				String delaystring = "";
->>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
+
 				for(String node: exedelay.keySet()){
 					delaystring += node+ ","+exedelay.get(node)+","+prodelay.get(node);
 					delaystring += "\n";
 					//					System.out.println(node+" , "+ delay.get(node));
 					//					System.out.println();
 				}
-<<<<<<< HEAD
+
 				
 //				System.out.println("inside topologyinfo check the delay string "+delaystring);
 				
 				flowstring += s+"\n";
-=======
-//				System.out.println("inside topologyinfo check the delay string "+delaystring);
-				Method.writeFile(delaystring, "performance/delay", true);
-				String flowstring = "";
->>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
+
+
 				HashMap<String, Long> records = flowrecords.get(s);
 				//				System.out.println("print flow info");
 				// initiallize it at the beginning
 				if(records.size()==0){
 					
 					for(String node : flow.keySet()){
-						System.out.println("first time updatet for "+node+ " with "+flow.get(node));
+//						System.out.println("first time updatet for "+node+ " with "+flow.get(node));
 						flowstring += node+" "+flow.get(node);
 						flowstring += "\n";
 					
@@ -181,19 +191,15 @@ public class ReUpdate implements Runnable{
 					for(String node : flow.keySet()){
 						flowstring += node+" "+(flow.get(node)-records.get(node));
 						flowstring += "\n";
-					
+						
 						records.put(node, flow.get(node));
 						
 					}
 				}
-<<<<<<< HEAD
+
 				//				System.out.println("print exe info");
 				exestring += s+"\n";
-=======
-				Method.writeFile(flowstring, "performance/flow", true);
-				//				System.out.println("print exe info");
-				String exestring = "";
->>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
+
 				for(String node : exe.keySet()){
 					exestring += node +","
 							+ "";
@@ -204,27 +210,95 @@ public class ReUpdate implements Runnable{
 					exestring += "\n";
 					//				System.out.println();
 				}
-<<<<<<< HEAD
-				
+				optString += s+"\n";
+				ArrayList<String> r = optReorder(spoutId, records, exedelay, prodelay);
+				for(String opt: r)
+					optString += opt+" ";
 			}
 			// write the records to the file
 			Method.writeFile(delaystring, "delay", true);
 			Method.writeFile(flowstring, "flow", true);
 			Method.writeFile(exestring, "execution", true);
+			Method.writeFile(optString, "optReorderHistory", true);
+			Method.writeFile(optString, "optReorder", false);
+		}
 			
+	}
+	/**
+	 * Reorder the operators by WSPT
+	 * @return
+	 */
+	public ArrayList<String> optReorder(String spoutId, HashMap<String, Long> records, HashMap<String, Double> exedelay, HashMap<String, Double> prodelay) {
+		HashMap<String, Integer> weights = new HashMap<String, Integer>();
 		
-		}
-			
-=======
-				Method.writeFile(exestring, "performance/execution", false);
+		HashMap<String, Integer> m = new HashMap<String, Integer>();
+		int p = 1;
+		weights.put(spoutId, p);
+		ArrayList<String> links = new ArrayList<String>();
+		for(String s: records.keySet()) 
+			links.add(s);
+		while (links.size()>0){
+			// find the operators by iterating the flow link
+			for(int i = 0; i<links.size(); i++) {
+				String l = links.get(i);
+				if(l.contains("-") && weights.containsKey(l.split("-")[0])){
+					String al = l.split("-")[1];
+					p = p+ 1;
+					weights.put(al, p);
+					links.remove(l);
+					break;
+				}		
 			}
-			//		
-
 		}
->>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
+		for(String s: weights.keySet()) {
+			double a = exedelay.get(s);
+			double r = 0;
+			if(s.equals(spoutId))
+				r = a;
+			else {
+				double b = prodelay.get(s);
+				r = (a>b)? a:b;
+			}
+		
+			m.put(s, (int) Math.round(r/weights.get(s)));
+			maxmLa.put(s, String.format("%.2f", r));
+			System.out.println("add a new record to the metrics as "+s+" , "+ weights.get(s)+" , "+  r + " , " + (int) Math.round(r/weights.get(s)));
+		}
+		ArrayList<String> result = new ArrayList<String>();
+		for(String s: sortByComparator(m).keySet())
+			result.add(s);
+		
+		return result;
 	}
 
+	 @SuppressWarnings("unused")
+	private static Map<String, Integer> sortByComparator(Map<String, Integer> unsortMap)
+	    {
 
+	        List<Entry<String, Integer>> list = new LinkedList<Entry<String, Integer>>(unsortMap.entrySet());
+
+	        // Sorting the list based on values
+	        Collections.sort(list, new Comparator<Entry<String, Integer>>()
+	        {
+	            public int compare(Entry<String, Integer> o1,
+	                    Entry<String, Integer> o2)
+	            {
+	               
+	                    return o1.getValue().compareTo(o2.getValue());
+	              
+	            }
+	        });
+
+	        // Maintaining insertion order with the help of LinkedList
+	        Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
+	        for (Entry<String, Integer> entry : list)
+	        {
+	            sortedMap.put(entry.getKey(), entry.getValue());
+	        }
+
+	        return sortedMap;
+	    }
+	 
 	//	 get the topology operator 
 	public ArrayList<String> Operatorinfo(String tid){
 		ArrayList<String> ops = new ArrayList<>();
@@ -296,12 +370,12 @@ public class ReUpdate implements Runnable{
 						delay.put(oid, Double.valueOf(templ));
 					}
 				}
-				topo = (JSONArray)jobj.get("outputStats");	
-				Object objobj = topo.get(0);
-				JSONObject jobjjobj = (JSONObject) objobj;
-				long trans = (Long)jobjjobj.get("transferred");
-				String link = oid+"-";
-				flow.put(link, trans);
+//				topo = (JSONArray)jobj.get("outputStats");	
+//				Object objobj = topo.get(0);
+//				JSONObject jobjjobj = (JSONObject) objobj;
+//				long trans = (Long)jobjjobj.get("transferred");
+//				String link = oid+"-";
+//				flow.put(link, trans);
 
 				topo = (JSONArray)jobj.get("executorStats");	
 				for(int i = 0; i<topo.size(); i++){

@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import scala.Array;
+
 
 public class Starting {
 
@@ -26,7 +26,7 @@ public class Starting {
 		 ScheduledExecutorService scheduledPool = Executors.newScheduledThreadPool(15);
 		 //the times to monitor
 
-		 int count =31;
+		 int count =5;
 //		 int count =30;
 //		 int metiscount = 1;
 		 HashMap<String, HashMap<String, Long>> flowrecords = new HashMap<>();
@@ -41,7 +41,7 @@ public class Starting {
 ////			s.mergeInfo();
 //			s.writeOpdemand();
 
-			Thread.sleep(30*1000);
+			Thread.sleep(60*1000);
 //			Thread.sleep(2*60*1000);
 
 			

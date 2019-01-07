@@ -3,6 +3,7 @@ package stormuiinfo;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,15 +18,7 @@ import org.apache.storm.utils.Time;
 import general.Method;
 import scala.collection.script.Start;
 
-<<<<<<< HEAD
-/**
- * metis graph partitioning
- * @author yidwa
- *
- */
-=======
 
->>>>>>> afe951f4e91a815d89cfc2ac675f0c1f7892dfc2
 
 public class GenerateMetis implements Runnable{
 
@@ -49,6 +42,7 @@ public class GenerateMetis implements Runnable{
 //	
 //	
 	
+
 	
 	public ArrayList<ArrayList<Integer>> iniEdges(){
 		ArrayList<ArrayList<Integer>> edges = new ArrayList<>();
